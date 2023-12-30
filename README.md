@@ -1,2 +1,2 @@
-make
-/dev/shm/runCsv sample.csv
+    make
+    /dev/shm/runCsv sample.csv
