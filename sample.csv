@@ -1,0 +1,14 @@
+baseName,pdbFname,jsonFname,chain,middleFrequency,octavesPerAngstrom,middleLength,durationFoldPerAngstrom,coordCutoff,harmonicsOctavesPerAngstrom,dynamicsAxis,frequencyAxis,durationAxis,harmonicsAxis,allBackbone,xmlFname,noteFname,wavFname,samplingRate,dynamicsSmoothing,freqIdx
+1A0S,pdb/BASE.pdb,json/BASE_CHAIN.json,P,440,0.09,0.25,0.05,20,0.03,y,z,x,,FALSE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN.wav,48000,0.995,0
+1A0S,pdb/BASE.pdb,json/BASE_CHAIN.json,Q,440,0.09,0.25,0.05,20,0.03,y,z,x,,FALSE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN.wav,48000,0.995,0
+1A0S,pdb/BASE.pdb,json/BASE_CHAIN.json,R,440,0.09,0.25,0.05,20,0.03,y,z,x,,FALSE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN.wav,48000,0.995,0
+1I8F,pdb/BASE.pdb,json/BASE_CHAIN.json,A,440,0.1,0.25,0.08,20,0.03,z,y,x,,FALSE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN.wav,48000,0.995,0
+1I8F,pdb/BASE.pdb,json/BASE_CHAIN.json,B,440,0.1,0.25,0.08,20,0.03,z,y,x,,FALSE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN.wav,48000,0.995,0
+1I8F,pdb/BASE.pdb,json/BASE_CHAIN.json,C,440,0.1,0.25,0.08,20,0.03,z,y,x,,FALSE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN.wav,48000,0.995,0
+1I8F,pdb/BASE.pdb,json/BASE_CHAIN.json,D,440,0.1,0.25,0.08,20,0.03,z,y,x,,FALSE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN.wav,48000,0.995,0
+1I8F,pdb/BASE.pdb,json/BASE_CHAIN.json,E,440,0.1,0.25,0.08,20,0.03,z,y,x,,FALSE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN.wav,48000,0.995,0
+1I8F,pdb/BASE.pdb,json/BASE_CHAIN.json,F,440,0.1,0.25,0.08,20,0.03,z,y,x,,FALSE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN.wav,48000,0.995,0
+1I8F,pdb/BASE.pdb,json/BASE_CHAIN.json,G,440,0.1,0.25,0.08,20,0.03,z,y,x,,FALSE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN.wav,48000,0.995,0
+6CZJ,pdb/BASE.pdb,json/BASE_CHAIN.json,A,440,0.1,0.25,0.11,15,0.03,z,y,x,,FALSE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN.wav,48000,0.995,0
+1GCN,pdb/BASE.pdb,json/BASE_CHAIN.json,A,440,1,0.25,0.11,20,0.03,,z,y,x,TRUE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN_0.wav,48000,0.995,0
+1GCN,pdb/BASE.pdb,json/BASE_CHAIN.json,A,440,1,0.25,0.11,20,0.03,,z,y,x,TRUE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN_1.wav,48000,0.995,1
