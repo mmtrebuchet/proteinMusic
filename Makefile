@@ -28,7 +28,7 @@ wav:
 clean:
 	rm -r json output scores wav
 
-music: /dev/shm/runCsv sample.csv
+music: all sample.csv
 	/dev/shm/runCsv sample.csv
 
 all: /dev/shm/jsonToXml /dev/shm/jsonToWav /dev/shm/pdbToJson /dev/shm/runCsv /dev/shm/jsonToDat json output scores wav /dev/shm/datToXyz
