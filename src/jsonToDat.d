@@ -1,23 +1,21 @@
 import std.stdio;
 import std.getopt;
-import libJsonToXml;
+import libJsonToDat;
 
 
 void main(string[] args){
-    string outXml;
     string inJson;
-    bool autoTime = false;
+    string noteFname;
     auto helpInfo = getopt(
         args,
         "in", "The json-format input file", &inJson,
-        "xml", "The name of the musicxml file to write", &outXml,
-        "auto-time", "Should the time signature match the note lengths?", &autoTime);
+        "notes", "The name of the plain text file to write containing note values.", &noteFname);
     if (helpInfo.helpWanted){
         defaultGetoptPrinter("Convert a json file containing atom frequency, duration, dynamics, and chord data into a musicxml file",
                 helpInfo.options);
         return;
     }
-    runToXml(inJson, outXml, autoTime);
+    jsonToNotes(inJson, noteFname);
 }
 /*     This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

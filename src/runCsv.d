@@ -2,6 +2,8 @@ import std.csv;
 import libPdbToJson;
 import libJsonToXml;
 import libJsonToWav;
+import libJsonToDat;
+import libDatToXyz;
 import std.file;
 import std.stdio;
 import std.conv;
@@ -30,6 +32,8 @@ struct csvRow{
     int samplingRate;
     float dynamicsSmoothing;
     int freqIdx;
+    string xyzFname;
+    bool autoTime;
 }
 
 char toChr(string s){
@@ -73,6 +77,7 @@ void runRecord(csvRow r){
     r.xmlFname = normString(r.xmlFname, r.chain, r.baseName);
     r.noteFname = normString(r.noteFname, r.chain, r.baseName);
     r.wavFname = normString(r.wavFname, r.chain, r.baseName);
+    r.xyzFname = normString(r.xyzFname, r.chain, r.baseName);
     
     printFields(r);
 
@@ -82,10 +87,16 @@ void runRecord(csvRow r){
             r.middleLength, r.durationFoldPerAngstrom,
             r.harmonicsOctavesPerAngstrom, r.jsonFname);
 
-    runToXml(r.jsonFname, r.xmlFname, "", r.noteFname);
+    runToXml(r.jsonFname, r.xmlFname, r.autoTime);
 
+    jsonToNotes(r.jsonFname, r.noteFname);
+    
     runToWav(r.jsonFname, r.wavFname, r.samplingRate, r.dynamicsSmoothing,
             r.freqIdx);
+    if(r.harmonicsAxis == ""){
+        runToXyz(r.noteFname, r.xyzFname, r.middleFrequency, r.octavesPerAngstrom,
+                 r.middleLength, r.durationFoldPerAngstrom, r.coordCutoff);
+    }
 }
 
 
@@ -99,7 +110,8 @@ void main(string[] args){
          "octavesPerAngstrom", "middleLength", "durationFoldPerAngstrom",
          "coordCutoff", "harmonicsOctavesPerAngstrom", "dynamicsAxis",
          "frequencyAxis", "durationAxis", "harmonicsAxis", "allBackbone",
-         "xmlFname", "noteFname", "wavFname", "samplingRate", "dynamicsSmoothing", "freqIdx"];
+         "xmlFname", "noteFname", "wavFname", "samplingRate", "dynamicsSmoothing",
+         "freqIdx", "xyzFname", "autoTime"];
     auto csvContents = readText(args[1]);
     auto records = array(csvReader!csvRow(csvContents, header));
     foreach(i, record; records){

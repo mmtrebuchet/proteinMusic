@@ -7,8 +7,8 @@ import std.format;
 import std.getopt;
 
 
-int NOTE_LEN = 64;
-immutable string NOTE_NAME = "64th";
+int NOTE_LEN = 32;
+immutable string NOTE_NAME = "32nd";
 string REST_NOTE = format("
       <note>
         <rest />
@@ -27,8 +27,10 @@ struct Note{
     long noteNumber;
     bool tieEnd;
     string dynamic;
+    bool noteStartsTie;
 
     this(float[] frequencies, float dynamicVal, bool tieStart, bool tieEnd){
+        this.noteStartsTie = tieStart;
         foreach(frequency; frequencies){
             this.setNote(frequency);
         }
@@ -124,71 +126,11 @@ struct Note{
 
 }
 
-string numToDur(float duration){
-    char[] ret;
-    while (duration > 1){
-        ret ~= "\U0001D15D ";
-        duration -= 1;
-    }
-    while (duration > 0.5){
-        ret ~= "\U0001D15E ";
-        duration -= 0.5;
-    }
-    while (duration > 1./4.){
-        ret ~= "\U0001D15F ";
-        duration -= 1./4.;
-    }
-    while (duration > 1./8.){
-        ret ~= "\U0001D160 ";
-        duration -= 1./8.;
-    }
-    while (duration > 1./16.){
-        ret ~= "\U0001D161 ";
-        duration -= 1./16.;
-    }
-    while (duration > 1/32.){
-        ret ~= "\U0001D162 ";
-        duration -= 1./32.;
-    }
-    while (duration > 1./64.){
-        ret ~= "\U0001D163 ";
-        duration -= 1./64.;
-    }
-    while (duration > 1./128.){
-        ret ~= "\U0001D164 ";
-        duration -= 1./128.;
-    }
-    return ret.idup;
-}
-
-string noteToPitches(float[] freqs){
-    string[] ret;
-    auto notes = ["A", "A\u266F", "B", "C", "C\u266F",
-         "D", "D\u266F", "E", "F", "F\u266F", "G", "G\u266F"];
-    foreach(freq; freqs){
-        float note_number_pre = 12 * log2(freq / 440) + 49;
-        auto note_number = rndtol(note_number_pre);
-        //print(note_number)
-        auto cents = rndtol((note_number_pre - note_number)*100);
-        auto note = (note_number - 1 ) % notes.length;
-        string noteStr = notes[note];
-
-        auto octave = (note_number + 8 ) / notes.length;
-        ret ~= format("%s%d %+d", noteStr, octave, cents);
-    }
-    return format("%s", ret);
-}
-
-Note[] jsonToNotes(string jsonFname, string noteFname){
+Note[] jsonToNotes(string jsonFname){
     auto fileContents = readText(jsonFname);
     auto atomsJson = parseJSON(fileContents);
     auto numAtoms = atomsJson.get!(JSONValue[]).length;
     auto notesAppender = appender!(Note[]);
-    File outNotes;
-    if(noteFname.length){
-        //We want to write notes.
-        outNotes = File(noteFname, "w");
-    }
     foreach(i, atom; atomsJson.get!(JSONValue[])){
         float dynamic;
         try{
@@ -209,17 +151,86 @@ Note[] jsonToNotes(string jsonFname, string noteFname){
         }
         auto lastNote = Note(frequencies, dynamic, false, true);
         notesAppender.put(lastNote);
-        if(noteFname.length){
-            //We want to write an entry to the note file.
-            outNotes.writefln("%5s %8.3f %8.3f %8.3f %15s %3s %14s", i,
-                    atom["x"].floating, atom["y"].floating, atom["z"].floating, 
-                    noteToPitches(frequencies), lastNote.dynamic,
-                     numToDur(atom["duration"].floating));
-        }
-            
     }
     return notesAppender[];
 }
+
+string curNoteToTimeMeasure(Note[] notes, ref int readHead, int measureNumber,
+        ref char curClef, ref string curDynamic){
+    //How many notes in this measure?
+    auto curMeasure = appender!string;
+    int numNotes = 1;
+    int readStart = readHead;
+    while(readHead < notes.length && notes[readHead++].noteStartsTie){numNotes++;}
+    curMeasure.put(format("    <measure number=\"%s\">\n", measureNumber));
+    if (readStart == 0){
+        //This is the first note written.
+        curMeasure.put(format("
+      <attributes>
+        <divisions>4</divisions>
+        <key>
+          <fifths>0</fifths>
+          </key>
+        <time print-object=\"no\">
+          <beats>%s</beats>
+          <beat-type>%s</beat-type>
+          </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+          </clef>
+        </attributes>\n", numNotes, NOTE_LEN));
+    }else{
+        curMeasure.put(format("
+      <attributes>
+        <time print-object=\"no\">
+          <beats>%s</beats>
+          <beat-type>%s</beat-type>
+          </time>
+        </attributes>\n", numNotes, NOTE_LEN));
+    }
+
+    for(int noteNum = 0; noteNum < numNotes; noteNum++){
+        auto note = notes[readStart + noteNum];
+        if (note.dynamic != curDynamic){
+            curMeasure.put(format("
+        <direction placement=\"below\">
+          <direction-type>
+            <dynamics>
+              <%s/>
+              </dynamics>
+            </direction-type>
+          <sound dynamics=\"%s\"/>
+          </direction>", note.dynamic, note.dynamicVal*50+75));
+                curDynamic = note.dynamic;
+        }
+        if (note.noteNumber < 40 && curClef == 'G'){
+            curMeasure.put("<attributes> <clef> <sign>F</sign><line>4</line></clef></attributes>");
+            curClef = 'F';
+        }else if (note.noteNumber > 45 && curClef == 'F'){
+            curMeasure.put("<attributes> <clef> <sign>G</sign><line>2</line></clef></attributes>");
+            curClef = 'G';
+        }
+        curMeasure.put(note.toXml());
+    }
+    curMeasure.put("      </measure>");
+    return curMeasure[];
+}
+
+
+string[] notesToTimeMeasures(Note[] notes){
+    int readHead = 0;
+    int measureNumber = 1;
+    char curClef = 'G';
+    string curDynamic = "ppp";
+    string[] ret;
+    while(readHead < notes.length){
+        ret ~= curNoteToTimeMeasure(notes, readHead, measureNumber++,
+                curClef, curDynamic);
+    }
+    return ret;
+}
+
 
 string[] notesToMeasures(Note[] notes){
     string[] measures;
@@ -281,16 +292,14 @@ string[] notesToMeasures(Note[] notes){
     return measures;
 }
 
-void runToXml(string inJson, string outXml, string outCents, string noteFname){
-    auto notes = jsonToNotes(inJson, noteFname);
-    if(outCents.length){
-        auto outCentsFp = File(outCents, "w");
-        foreach(note; notes){
-            outCentsFp.writeln(note.cents);
-        }
-        outCentsFp.close();
+void runToXml(string inJson, string outXml, bool autoTime){
+    auto notes = jsonToNotes(inJson);
+    string[] measures;
+    if (autoTime){
+        measures = notesToTimeMeasures(notes);
+    }else{
+        measures = notesToMeasures(notes);
     }
-    auto measures = notesToMeasures(notes);
     auto header = readText("src/header.xml");
     auto outFp = File(outXml, "w");
     outFp.writeln(header);
