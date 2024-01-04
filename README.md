@@ -1,2 +1,1 @@
-    make
-    /dev/shm/runCsv sample.csv
+    make music
