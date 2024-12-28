@@ -129,9 +129,9 @@ struct Note{
 Note[] jsonToNotes(string jsonFname){
     auto fileContents = readText(jsonFname);
     auto atomsJson = parseJSON(fileContents);
-    auto numAtoms = atomsJson.get!(JSONValue[]).length;
+    auto numAtoms = atomsJson.array().length;
     auto notesAppender = appender!(Note[]);
-    foreach(i, atom; atomsJson.get!(JSONValue[])){
+    foreach(i, atom; atomsJson.array()){
         float dynamic;
         try{
             dynamic = atom["dynamic"].floating;
@@ -140,7 +140,7 @@ Note[] jsonToNotes(string jsonFname){
         }
         auto durRemaining = atom["duration"].floating;
         float[] frequencies;
-        foreach(jsonFreq; atom["freq"].get!(JSONValue[])){
+        foreach(jsonFreq; atom["freq"].array()){
             frequencies ~= jsonFreq.floating;
         }
         notesAppender.put(Note(frequencies, dynamic, true, false));

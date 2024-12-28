@@ -16,13 +16,13 @@ struct Wave{
     this(string inFname, int samplingRate, int freqIdx, float smoothDynamics){
         auto fileContents = readText(inFname);
         auto atomsJson = parseJSON(fileContents);
-        auto numAtoms = atomsJson.get!(JSONValue[]).length;
+        auto numAtoms = atomsJson.array().length;
         auto appendAtomsByTime = appender!(int[]);
         this.smoothDynamics = smoothDynamics;
         this.samplingRate = samplingRate;
         this.frequencyByAtom = new float[numAtoms];
         this.dynamicsByAtom = new float[numAtoms];
-        foreach(i, atom; atomsJson.get!(JSONValue[])){
+        foreach(i, atom; atomsJson.array()){
             float dynamic;
             try{
                 dynamic = atom["dynamic"].floating;

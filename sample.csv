@@ -18,3 +18,4 @@ baseName,pdbFname,jsonFname,chain,middleFrequency,octavesPerAngstrom,middleLengt
 1A0S_low,pdb/1A0S.pdb,json/BASE_CHAIN.json,P,220,0.04,0.25,0.05,20,0.03,y,z,x,,FALSE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN.wav,48000,0.995,0,output/BASE_CHAIN.xyz,FALSE
 1A0S_high,pdb/1A0S.pdb,json/BASE_CHAIN.json,Q,880,0.04,0.25,0.05,20,0.03,y,z,x,,FALSE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN.wav,48000,0.995,0,output/BASE_CHAIN.xyz,FALSE
 1A0S_mid,pdb/1A0S.pdb,json/BASE_CHAIN.json,R,440,0.04,0.25,0.05,20,0.03,y,z,x,,FALSE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN.wav,48000,0.995,0,output/BASE_CHAIN.xyz,FALSE
+2M89,pdb/2M89_1.pdb,json/BASE_CHAIN.json,A,650,0.02,0.15,0.15,20,0.03,y,x,z,,FALSE,scores/BASE_CHAIN.musicxml,output/BASE_CHAIN.txt,wav/BASE_CHAIN.wav,48000,0.995,0,output/BASE_CHAIN.xyz,FALSE

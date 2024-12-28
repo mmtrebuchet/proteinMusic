@@ -93,9 +93,9 @@ string noteToPitches(float[] freqs, out float[] outFreqs){
 void jsonToNotes(string jsonFname, string noteFname){
     auto fileContents = readText(jsonFname);
     auto atomsJson = parseJSON(fileContents);
-    auto numAtoms = atomsJson.get!(JSONValue[]).length;
+    auto numAtoms = atomsJson.array().length;
     auto outNotes = File(noteFname, "w");
-    foreach(i, atom; atomsJson.get!(JSONValue[])){
+    foreach(i, atom; atomsJson.array()){
         float dynamic;
         try{
             dynamic = atom["dynamic"].floating;
@@ -103,7 +103,7 @@ void jsonToNotes(string jsonFname, string noteFname){
             dynamic = 1.0 * atom["dynamic"].integer;
         }
         float[] frequencies;
-        foreach(jsonFreq; atom["freq"].get!(JSONValue[])){
+        foreach(jsonFreq; atom["freq"].array()){
             frequencies ~= jsonFreq.floating;
         }
         float roundDuration;

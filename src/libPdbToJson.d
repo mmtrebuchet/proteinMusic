@@ -7,6 +7,15 @@ import std.getopt;
 import std.string;
 import std.algorithm;
 
+T mean(T)(T[] arg){
+    T sum = 0;
+    size_t num = 0;
+    foreach(elem; arg){
+        sum += elem;
+        num++;
+    }
+    return sum * 1.0 / num;
+}
 struct Pdb{
     float[] x, y, z;
     float[] durations;
