@@ -7,8 +7,8 @@ import std.format;
 import std.getopt;
 
 
-int NOTE_LEN = 32;
-immutable string NOTE_NAME = "32nd";
+int NOTE_LEN = 64;
+immutable string NOTE_NAME = "64th";
 string REST_NOTE = format("
       <note>
         <rest />
@@ -300,9 +300,12 @@ void runToXml(string inJson, string outXml, bool autoTime){
     }else{
         measures = notesToMeasures(notes);
     }
+    // Get the title of the piece to display on the score.
+    auto workName = outXml.split("/")[$-1][0..$-9];
     auto header = readText("src/header.xml");
+    auto replacedHeader = header.replace("WORK_TITLE", workName);
     auto outFp = File(outXml, "w");
-    outFp.writeln(header);
+    outFp.writeln(replacedHeader);
     foreach(m; measures){
         outFp.writeln(m);
     }

@@ -31,4 +31,7 @@ clean:
 music: all sample.csv
 	/dev/shm/runCsv sample.csv
 
+hiv: all hiv.csv
+	/dev/shm/runCsv hiv.csv
+
 all: /dev/shm/jsonToXml /dev/shm/jsonToWav /dev/shm/pdbToJson /dev/shm/runCsv /dev/shm/jsonToDat json output scores wav /dev/shm/datToXyz

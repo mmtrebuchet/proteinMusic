@@ -29,6 +29,9 @@ struct Wave{
             }catch(JSONException e){
                 dynamic = 1.0 * atom["dynamic"].integer;
             }
+            if (dynamic == 0.0){
+                dynamic = 0.01;
+            }
             this.dynamicsByAtom[i] = dynamic;
             this.frequencyByAtom[i] = atom["freq"][freqIdx].floating;
             for(int j = 0; j < atom["duration"].floating * samplingRate; j++){

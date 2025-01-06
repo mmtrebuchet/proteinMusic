@@ -22,16 +22,17 @@ struct Pdb{
     float[][] frequency;
     float[] dynamics;
     this(string inFname, char chain, bool allBackbone){
-        auto atomStrings = ["CA"];
+        auto atomStrings = ["CA ", "P  "];
         if (allBackbone){
-            atomStrings ~= ["N ", "C "];
+            atomStrings ~= ["N  ", "C  "];
+            atomStrings ~= ["O3'", "C3'", "C4'", "C5'", "O5'"];
         }
         auto fp = File(inFname, "r");
         foreach(line; fp.byLineCopy()){
             if(line.length > 4 && line[0..4] == "ATOM"){
                 //We're in an atom record.
                 if(line[21] == chain &&
-                        atomStrings.canFind(line[13..15])){
+                        atomStrings.canFind(line[13..16])){
                     //And we hit an alpha carbon on the right chain.
                     this.x ~= to!float(strip(line[30..38]));
                     this.y ~= to!float(strip(line[38..46]));
@@ -54,10 +55,10 @@ struct Pdb{
             this.y[i] -= yMean;
             this.z[i] -= zMean;
         }
-        writefln("(min max)");
-        writefln("X (%s %s)", minElement(this.x), maxElement(this.x));
-        writefln("Y (%s %s)", minElement(this.y), maxElement(this.z));
-        writefln("Z (%s %s)", minElement(this.z), maxElement(this.z));
+        /* writefln("(min max)"); */
+        /* writefln("X (%s %s)", minElement(this.x), maxElement(this.x)); */
+        /* writefln("Y (%s %s)", minElement(this.y), maxElement(this.z)); */
+        /* writefln("Z (%s %s)", minElement(this.z), maxElement(this.z)); */
     }
 
     void loadDurations(float[] data, float middleLength, float durationFoldPerAngstrom){

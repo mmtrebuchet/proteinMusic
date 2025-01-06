@@ -47,19 +47,17 @@ char toChr(string s){
 void printFields(T)(T args)
 {
     auto values = args.tupleof;
-    
+
     size_t max;
     size_t temp;
-    foreach (index, value; values)
-    {
+    foreach (index, value; values){
         temp = T.tupleof[index].stringof.length;
         if (max < temp) max = temp;
     }
     max += 1;
-    foreach (index, value; values)
-    {
+    foreach (index, value; values){
         writefln("%-" ~ to!string(max) ~ "s %s", T.tupleof[index].stringof, value);
-    }                
+    }
 }
 
 string normString(string arg, char chainChar, string baseName){
@@ -69,17 +67,24 @@ string normString(string arg, char chainChar, string baseName){
     return retChain;
 }
 
+void runRender(File outFp, string pdbFname, char chain, string jsonFname){
+    auto outName = jsonFname.split("/")[$-1][0..$-5];
+    outFp.writefln("vmd -e src/makeRender.vmd -args %s %s %s", pdbFname, chain, outName);
+    outFp.writefln("convert -trim render/%s.tga render/%s.png", outName, outName);
+}
 
 
-void runRecord(csvRow r){
+
+void runRecord(csvRow r, File renderFile){
     r.pdbFname = normString(r.pdbFname, r.chain, r.baseName);
     r.jsonFname = normString(r.jsonFname, r.chain, r.baseName);
     r.xmlFname = normString(r.xmlFname, r.chain, r.baseName);
     r.noteFname = normString(r.noteFname, r.chain, r.baseName);
     r.wavFname = normString(r.wavFname, r.chain, r.baseName);
     r.xyzFname = normString(r.xyzFname, r.chain, r.baseName);
-    
-    printFields(r);
+
+    /* printFields(r); */
+    writefln("Score name: %s", r.xmlFname);
 
     runToJson(r.pdbFname, r.chain, r.allBackbone, toChr(r.dynamicsAxis),
             toChr(r.frequencyAxis), toChr(r.durationAxis), toChr(r.harmonicsAxis),
@@ -90,9 +95,11 @@ void runRecord(csvRow r){
     runToXml(r.jsonFname, r.xmlFname, r.autoTime);
 
     jsonToNotes(r.jsonFname, r.noteFname);
-    
+
     runToWav(r.jsonFname, r.wavFname, r.samplingRate, r.dynamicsSmoothing,
             r.freqIdx);
+
+    runRender(renderFile, r.pdbFname, r.chain, r.jsonFname);
     if(r.harmonicsAxis == ""){
         runToXyz(r.noteFname, r.xyzFname, r.middleFrequency, r.octavesPerAngstrom,
                  r.middleLength, r.durationFoldPerAngstrom, r.coordCutoff);
@@ -114,9 +121,10 @@ void main(string[] args){
          "freqIdx", "xyzFname", "autoTime"];
     auto csvContents = readText(args[1]);
     auto records = array(csvReader!csvRow(csvContents, header));
+    auto renderFile = File("render.sh", "w");
     foreach(i, record; records){
-        writefln("Record %s / %s", i, records.length);
-        runRecord(record);
+        writefln("");
+        runRecord(record, renderFile);
     }
 }
 /*     This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.

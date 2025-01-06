@@ -1,0 +1,26 @@
+display resize 800 800
+mol new [lindex $argv 0]
+
+mol selection "chain [lindex $argv 1] and (protein or nucleic)"
+
+mol modrep 0 0
+axes location Origin
+display resetview
+mol modstyle 0 0 NewCartoon 0.3 10 4.1 0
+
+rotate y by -45
+rotate x by 45
+color Display Background white
+mol modcolor 0 0 Index
+
+set sel [atomselect top "chain [lindex $argv 1] and (protein or nucleic)"]
+set minidx [lindex [$sel get index] 0]
+set maxidx [lindex [$sel get index] end-1]
+
+mol scaleminmax 0 0 $minidx $maxidx
+display update
+display resize 800 800
+puts [display get size]
+render TachyonInternal "render/[lindex $argv 2].tga" true
+
+exit

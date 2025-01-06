@@ -1,6 +1,7 @@
 import std.stdio;
 import std.json;
 import std.math;
+import std.math.rounding;
 import std.file;
 import std.array;
 import std.format;
@@ -84,9 +85,7 @@ string noteToPitches(float[] freqs, out float[] outFreqs){
         float reverseNoteNumber = note_number + alter;
         auto reconstructedFrequency = 440. * exp2((reverseNoteNumber - 49.) / 12.);
         outFreqs ~= reconstructedFrequency;
-        
     }
-    
     return format("%s", ret);
 }
 
@@ -95,6 +94,9 @@ void jsonToNotes(string jsonFname, string noteFname){
     auto atomsJson = parseJSON(fileContents);
     auto numAtoms = atomsJson.array().length;
     auto outNotes = File(noteFname, "w");
+    float minFreq = 1000000;
+    float maxFreq = 0;
+    float totalDuration = 0;
     foreach(i, atom; atomsJson.array()){
         float dynamic;
         try{
@@ -104,21 +106,35 @@ void jsonToNotes(string jsonFname, string noteFname){
         }
         float[] frequencies;
         foreach(jsonFreq; atom["freq"].array()){
-            frequencies ~= jsonFreq.floating;
+            float curFreq = jsonFreq.floating;
+            if (curFreq > maxFreq){
+                maxFreq = curFreq;
+            }
+            if (curFreq < minFreq){
+                minFreq = curFreq;
+            }
+            frequencies ~= curFreq;
         }
         float roundDuration;
         float[] freqReversed;
         auto dur = numToDur(atom["duration"].floating, roundDuration);
+        totalDuration += roundDuration;
         auto pitches = noteToPitches(frequencies, freqReversed);
         //We want to write an entry to the note file.
         auto freqList = format("%s", pitches)[1..$-1];
         float reverseDynamic;
         auto dynamicStr = numToDynamic(dynamic, reverseDynamic);
         outNotes.writefln("%s,%.3f,%.3f,%.3f,%s,%s,%s,%s,%s,%s", i,
-                atom["x"].floating, atom["y"].floating, atom["z"].floating, 
+                atom["x"].floating, atom["y"].floating, atom["z"].floating,
                 freqList, dynamicStr, dur,
                 roundDuration, freqReversed, reverseDynamic);
     }
+    float[] unused;
+    auto noteRange = noteToPitches([minFreq, maxFreq], unused);
+    auto minPitch = noteRange.split(" ")[0][2..$];
+    auto maxPitch = noteRange.split(" ")[2][1..$];
+    writefln("Range: %s - %s", minPitch, maxPitch);
+    writefln("Measures at 4/4: %s", ceil(totalDuration));
 }
 
 
